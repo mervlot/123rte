@@ -57,7 +57,10 @@ class CryptoScraper:
             params={"vs_currency": "usd", "order": "market_cap_desc", "per_page": n, "page": 1},
             timeout=10,
         )
-        return [self._format(c) for c in res.json()]
+        data = res.json()
+        if not isinstance(data, list):
+            raise ValueError("Invalid API response format")
+        return [self._format(c) for c in data]
 
     def _format(self, coin: dict) -> dict:
         return {
@@ -159,27 +162,34 @@ class CommodityScraper:
         rows   = res.text.strip().split("\n")
 
         if len(rows) < 2:
-            raise ValueError(f"No data for: {commodity}")
+            raise ValueError(f"No data available for {commodity}")
 
-        data = rows[1].split(",")
-        if not data or data[1] == "N/D":
-            raise ValueError(f"No data found for: {commodity}")
+        # Check if response is a header or error
+        if rows[0] and "Symbol" in rows[0]:
+            data = rows[1].split(",")
+            if not data or data[1] == "N/D" or data[0] == "N/D":
+                raise ValueError(f"No data found for {commodity}")
+        else:
+            raise ValueError(f"Invalid response for {commodity}")
 
-        open_p  = float(data[3])
-        close_p = float(data[6])
-        change  = close_p - open_p
+        try:
+            open_p  = float(data[3])
+            close_p = float(data[6])
+            change  = close_p - open_p
 
-        return {
-            "symbol":     symbol.upper(),
-            "label":      commodity,
-            "date":       data[1],
-            "open":       open_p,
-            "high":       float(data[4]),
-            "low":        float(data[5]),
-            "close":      close_p,
-            "change":     round(change, 4),
-            "change_pct": round((change / open_p) * 100, 2),
-        }
+            return {
+                "symbol":     symbol.upper(),
+                "label":      commodity,
+                "date":       data[1],
+                "open":       open_p,
+                "high":       float(data[4]),
+                "low":        float(data[5]),
+                "close":      close_p,
+                "change":     round(change, 4),
+                "change_pct": round((change / open_p) * 100, 2),
+            }
+        except (ValueError, IndexError) as e:
+            raise ValueError(f"Error parsing data for {commodity}: {str(e)}")
 
     @staticmethod
     def available() -> list[str]:
