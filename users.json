@@ -1,0 +1,24 @@
+{
+    "7595876162": {
+        "id": 7595876162,
+        "username": "mervlot",
+        "first_name": "Muhammad",
+        "last_name": "Ogunmuyiwa",
+        "is_bot": false,
+        "language_code": "en",
+        "joined_at": "2026-03-31T18:38:31",
+        "last_seen": "2026-03-31T20:55:38",
+        "requests": 89
+    },
+    "7663524947": {
+        "id": 7663524947,
+        "username": null,
+        "first_name": "ayomide",
+        "last_name": null,
+        "is_bot": false,
+        "language_code": "en",
+        "joined_at": "2026-03-31T19:00:26",
+        "last_seen": "2026-03-31T19:00:26",
+        "requests": 1
+    }
+}
